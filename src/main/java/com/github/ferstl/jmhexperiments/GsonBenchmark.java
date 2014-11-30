@@ -1,4 +1,4 @@
-package com.github.ferstl;
+package com.github.ferstl.jmhexperiments;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
