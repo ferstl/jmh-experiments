@@ -63,20 +63,6 @@ import com.google.gson.annotations.Expose;
 public class GsonBenchmark {
 
   private static final Gson GSON = createGson();
-  private static final String EXAMPLE_TEXT =
-      "72bH`CZYn6Kk\u003dRUpD2L8bHxqCLBrCkLFOXcXkKt/E\u003eMrFfyjV\\?5JGfxI@XOq\u003eyjCClot]`4YwvKF:\u003d"
-    + "dvKYkTO_lh_xFVFpT\u003ca6Q@W\u003eY1WCjJAUU5aNAAugfWs^SFF:gZ0A3ENw9\u003c?dvMNCaDWAjr?Orcp2Lb?ttDV[N"
-    + "p5vVaVp@EpM;Oklaqq\u003e;s4@5?UoduJkOQYv_aK5tZ\u003eq\u003d`EU5O^P^MkY0UknGslO3M^\u003dPUKsV50SmC;Wo"
-    + "FnD:WXow?XQT30\u003c4`DfOVKmO9v9Eo9\u003emTmUlkpjCx75\u003dJD\\@G1lICrBf78RhFm6MlcQTaQyI0w/9dv3CQp?7"
-    + "R?Hy1[nIosZSIOre9vcS?[rvK?]fd;^kr[GqrV\u003c:hjcDy9wdDg\u003c^tFe\u003eNG\u003dfbfu^L\\b`EW:ep/75VRr"
-    + "wQfnLJLlHh7vLsq]4\u003cCDRf\u003e`EhlSb0DPK3N\\8N]kZPRV`sfV]yrtY_pb/Nm?UBNRe2Z0@t\u003efFE6T^Vokdx?T"
-    + "muI??Z6u_y9rdI2k[_\u003d::M/NY5`sOUk`U7F5IfOYkaBtA6Hcey]8hN^@pbHgN\\uBwDxR05VRAD`4xYZ`F\u003dXc\u003d"
-    + "@\u003dft]DUMh@Wek?4Cso@yY_^cDbl@sFyg;@RB/lnOdEEcpE5oE\u003egh[j@\u003cSf/pMpL8trmQyvsV?NKv@ivgjQbS"
-    + "qESP1ino6^\u003d\u003d^^UJXq\\D1\u003cZURaPh7Ax5Vt@Jscc\\Wqb?BGW0IO]ibjAgp?Nv^4@Tpe\u003c?eUhm8_g9p^R"
-    + "jMAljX:]:Bh0eq7Y8qCBA;LC8\u003cCUZ9nr1`4I;irL\u003eGH\\4uQ`k\\OppRMx\\tl[5C6/uPn\u003dp^M\u003ddA;m6"
-    + "pi5Q@\\\u003cHX0\u003eruHV4]k@8S9BxUXeS^k^10Z8:DCLk3/ZxG\\jD?f2HOYF/\u003c;o:oAOPGqAS[^wXmvA?kG2fEyw"
-    + "jf1RT8bN@6[5tvJGmrnpu?ns5k13N9PdH:7VR1GY\\1C_581t8choRVr?ajl[;GhWF4J@^N;NvZE19UK2nCetMwqg_wZrlbgsS@V"
-    + "__V2QMKv[`p01VVZAVI6kHI3ZC";
 
   public static void main(String[] args) throws RunnerException {
     Options options = new OptionsBuilder()
@@ -85,12 +71,16 @@ public class GsonBenchmark {
     new Runner(options).run();
   }
 
+  /**
+   * Base line is assembling the JSON string with a string builder.
+   */
   @Benchmark
   public String baseline(TestObject obj) {
     StringBuilder sb = new StringBuilder();
     sb.append("{")
-      .append("\"time\":")
-      .append("\"text\":").append("\"").append(EXAMPLE_TEXT).append("\"")
+      .append("\"time\":").append("\"").append(obj.time).append("\"")
+      .append(",")
+      .append("\"text\":").append("\"").append(obj.text).append("\"")
       .append("}");
 
     return sb.toString();
@@ -108,7 +98,10 @@ public class GsonBenchmark {
   }
 
   private static Gson createGson() {
-    return new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+    return new GsonBuilder()
+      // JMH creates a subclass of state object. The fields of subclass must not be serialized.
+      .excludeFieldsWithoutExposeAnnotation()
+      .create();
   }
 
   @State(Scope.Thread)
