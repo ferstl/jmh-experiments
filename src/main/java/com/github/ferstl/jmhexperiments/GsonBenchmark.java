@@ -19,7 +19,6 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.annotations.Expose;
 
 
 /**
@@ -44,54 +43,62 @@ public class GsonBenchmark {
    * Base line is assembling the JSON string with a string builder.
    */
   @Benchmark
-  public String baseline(TestObject obj) {
+  public String baseline(TestState state) {
     StringBuilder sb = new StringBuilder();
+    TestObject testObject = state.testObject;
+
     sb.append("{")
-      .append("\"time\":").append("\"").append(obj.time).append("\"")
+      .append("\"time\":").append("\"").append(testObject.time).append("\"")
       .append(",")
-      .append("\"text\":").append("\"").append(obj.text).append("\"")
+      .append("\"text\":").append("\"").append(testObject.text).append("\"")
       .append("}");
 
     return sb.toString();
   }
 
   @Benchmark
-  public String newGson(TestObject obj) {
+  public String newGson(TestState state) {
     Gson gson = createGson();
-    return gson.toJson(obj);
+    return gson.toJson(state.testObject);
   }
 
   @Benchmark
-  public String sameGson(TestObject obj) {
-    return GSON.toJson(obj);
+  public String sameGson(TestState state) {
+    return GSON.toJson(state.testObject);
   }
 
   private static Gson createGson() {
     return new GsonBuilder()
-      // JMH creates a subclass of state object. The fields of subclass must not be serialized.
-      .excludeFieldsWithoutExposeAnnotation()
       .create();
   }
 
   @State(Scope.Thread)
-  public static class TestObject {
-    @Expose
-    long time;
-    @Expose
-    String text;
+  public static class TestState {
+    private TestObject testObject;
 
     @Setup(Level.Iteration)
     public void setup() {
       Random random = new Random();
 
-      this.time = System.currentTimeMillis();
-
       char[] chars = new char[1024];
       for (int i = 0; i < chars.length; i++) {
-        chars[i] = (char) (random.nextInt(75) + 47);
+        chars[i] = (char) (random.nextInt(57) + 65);
       }
 
-      this.text = new String(chars);
+      this.testObject = new TestObject(System.currentTimeMillis(), new String(chars));
+    }
+  }
+
+  /**
+   * Similar to {@link TestState} but without JMH subclassing.
+   */
+  private static class TestObject {
+    long time;
+    String text;
+
+    public TestObject(long time, String text) {
+      this.time = time;
+      this.text = text;
     }
   }
 }
