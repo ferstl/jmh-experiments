@@ -12,6 +12,7 @@ import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.Threads;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
@@ -66,6 +67,34 @@ public class GsonBenchmark {
 
   @Benchmark
   public String sameGson(TestState state) {
+    return GSON.toJson(state.testObject);
+  }
+
+  @Threads(8)
+  @Benchmark
+  public String concurrentBaseline(TestState state) {
+    StringBuilder sb = new StringBuilder();
+    TestObject testObject = state.testObject;
+
+    sb.append("{")
+      .append("\"time\":").append("\"").append(testObject.time).append("\"")
+      .append(",")
+      .append("\"text\":").append("\"").append(testObject.text).append("\"")
+      .append("}");
+
+    return sb.toString();
+  }
+
+  @Benchmark
+  @Threads(8)
+  public String concurrentNewGson(TestState state) {
+    Gson gson = createGson();
+    return gson.toJson(state.testObject);
+  }
+
+  @Benchmark
+  @Threads(8)
+  public String concurrentSameGson(TestState state) {
     return GSON.toJson(state.testObject);
   }
 
