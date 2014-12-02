@@ -47,55 +47,53 @@ public class GsonBenchmark {
    */
   @Benchmark
   public String baseline(TestState state) {
-    StringBuilder sb = new StringBuilder();
-    TestObject testObject = state.testObject;
-
-    sb.append("{")
-      .append("\"time\":").append("\"").append(testObject.time).append("\"")
-      .append(",")
-      .append("\"text\":").append("\"").append(testObject.text).append("\"")
-      .append("}");
-
-    return sb.toString();
+    return baseline(state.testObject);
   }
 
   @Benchmark
   public String newGson(TestState state) {
-    Gson gson = createGson();
-    return gson.toJson(state.testObject);
+    return newGson(state.testObject);
   }
 
   @Benchmark
   public String sameGson(TestState state) {
-    return GSON.toJson(state.testObject);
+    return sameGson(state.testObject);
   }
 
   @Threads(8)
   @Benchmark
   public String concurrentBaseline(TestState state) {
-    StringBuilder sb = new StringBuilder();
-    TestObject testObject = state.testObject;
-
-    sb.append("{")
-      .append("\"time\":").append("\"").append(testObject.time).append("\"")
-      .append(",")
-      .append("\"text\":").append("\"").append(testObject.text).append("\"")
-      .append("}");
-
-    return sb.toString();
+    return baseline(state.testObject);
   }
 
   @Benchmark
   @Threads(8)
   public String concurrentNewGson(TestState state) {
-    Gson gson = createGson();
-    return gson.toJson(state.testObject);
+    return newGson(state.testObject);
   }
 
   @Benchmark
   @Threads(8)
   public String concurrentSameGson(TestState state) {
-    return GSON.toJson(state.testObject);
+    return sameGson(state.testObject);
+  }
+
+  private String baseline(TestObject testObject) {
+    return new StringBuilder().append("{")
+      .append("\"time\":").append("\"").append(testObject.time).append("\"")
+      .append(",")
+      .append("\"text\":").append("\"").append(testObject.text).append("\"")
+      .append("}")
+      .toString();
+  }
+
+  private String newGson(TestObject testObject) {
+    Gson gson = createGson();
+    return gson.toJson(testObject);
+  }
+
+  private String sameGson(TestObject testObject) {
+    return GSON.toJson(testObject);
   }
 
   private static Gson createGson() {
@@ -119,6 +117,7 @@ public class GsonBenchmark {
       this.testObject = new TestObject(System.currentTimeMillis(), new String(chars));
     }
   }
+
 
   /**
    * Similar to {@link TestState} but without JMH subclassing.
