@@ -30,7 +30,7 @@ import com.google.gson.GsonBuilder;
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @Fork(1)
 public class GsonBenchmark {
-
+  private static final String JFR_OPTS_TEMPLATE = "-XX:FlightRecorderOptions=defaultrecording=true,settings=profile.jfc,dumponexit=true,dumponexitpath=";
   private static final Gson GSON = createGson();
 
   public static void main(String[] args) throws RunnerException {
@@ -38,6 +38,7 @@ public class GsonBenchmark {
       .include(".*Benchmark.*")
       .warmupIterations(10)
       .measurementIterations(10)
+      .jvmArgsPrepend("-XX:+UnlockCommercialFeatures", "-XX:+FlightRecorder")
       .build();
     new Runner(options).run();
   }
@@ -45,33 +46,39 @@ public class GsonBenchmark {
   /**
    * Base line is assembling the JSON string with a string builder.
    */
+  @Fork(jvmArgs = JFR_OPTS_TEMPLATE + "baseline.jfr")
   @Benchmark
   public String baseline(TestState state) {
     return baseline(state.testObject);
   }
 
+  @Fork(jvmArgs = JFR_OPTS_TEMPLATE + "newGson.jfr")
   @Benchmark
   public String newGson(TestState state) {
     return newGson(state.testObject);
   }
 
+  @Fork(jvmArgs = JFR_OPTS_TEMPLATE + "sameGson.jfr")
   @Benchmark
   public String sameGson(TestState state) {
     return sameGson(state.testObject);
   }
 
+  @Fork(jvmArgs = JFR_OPTS_TEMPLATE + "concurrentBaseline.jfr")
   @Threads(8)
   @Benchmark
   public String concurrentBaseline(TestState state) {
     return baseline(state.testObject);
   }
 
+  @Fork(jvmArgs = JFR_OPTS_TEMPLATE + "concurrentNewGson.jfr")
   @Benchmark
   @Threads(8)
   public String concurrentNewGson(TestState state) {
     return newGson(state.testObject);
   }
 
+  @Fork(jvmArgs = JFR_OPTS_TEMPLATE + "concurrentSameGson.jfr")
   @Benchmark
   @Threads(8)
   public String concurrentSameGson(TestState state) {
