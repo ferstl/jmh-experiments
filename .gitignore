@@ -2,6 +2,10 @@
 .project
 .factorypath
 *.jfr
+*.csv
+*.scsv
+*.text
+*.png
 .settings/org.eclipse.core.resources.prefs
 .settings/org.eclipse.m2e.core.prefs
 /target/

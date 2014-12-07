@@ -13,6 +13,7 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Threads;
+import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
@@ -35,11 +36,14 @@ public class GsonBenchmark {
   public static void main(String[] args) throws RunnerException {
     Options options = new OptionsBuilder()
       .include(".*Benchmark.*")
-      .warmupIterations(10)
-      .measurementIterations(10)
+      .warmupIterations(1)
+      .measurementIterations(1)
+      .resultFormat(ResultFormatType.CSV)
       .jvmArgsPrepend("-XX:+UnlockCommercialFeatures", "-XX:+FlightRecorder")
       .build();
     new Runner(options).run();
+
+    ChartFucker.fuck(options.getOutput().orElse("jmh-result.csv"));
   }
 
   /**
