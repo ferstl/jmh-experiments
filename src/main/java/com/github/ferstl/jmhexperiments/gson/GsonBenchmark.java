@@ -37,8 +37,8 @@ public class GsonBenchmark {
   public static void main(String[] args) throws RunnerException {
     Options options = new OptionsBuilder()
       .include(".*Benchmark.*")
-      .warmupIterations(5)
-      .measurementIterations(5)
+      .warmupIterations(10)
+      .measurementIterations(10)
       .resultFormat(ResultFormatType.CSV)
       .jvmArgsPrepend("-XX:+UnlockCommercialFeatures", "-XX:+FlightRecorder")
       .build();
