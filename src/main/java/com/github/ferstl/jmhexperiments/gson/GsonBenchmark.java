@@ -1,4 +1,4 @@
-package com.github.ferstl.jmhexperiments;
+package com.github.ferstl.jmhexperiments.gson;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -19,6 +19,7 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import com.github.ferstl.jmhexperiments.ChartFucker;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -36,8 +37,8 @@ public class GsonBenchmark {
   public static void main(String[] args) throws RunnerException {
     Options options = new OptionsBuilder()
       .include(".*Benchmark.*")
-      .warmupIterations(1)
-      .measurementIterations(1)
+      .warmupIterations(5)
+      .measurementIterations(5)
       .resultFormat(ResultFormatType.CSV)
       .jvmArgsPrepend("-XX:+UnlockCommercialFeatures", "-XX:+FlightRecorder")
       .build();
