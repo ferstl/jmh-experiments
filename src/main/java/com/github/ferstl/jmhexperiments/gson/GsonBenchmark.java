@@ -44,7 +44,7 @@ public class GsonBenchmark {
       .build();
     new Runner(options).run();
 
-    ChartFucker.fuck(options.getOutput().orElse("jmh-result.csv"));
+    ChartFucker.fuck(options.getResult().orElse("jmh-result.csv"));
   }
 
   /**
