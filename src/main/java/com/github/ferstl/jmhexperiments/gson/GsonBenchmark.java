@@ -114,7 +114,7 @@ public class GsonBenchmark {
 
   @State(Scope.Thread)
   public static class TestState {
-    private TestObject testObject;
+    private volatile TestObject testObject;
 
     @Setup(Level.Iteration)
     public void setup() {
