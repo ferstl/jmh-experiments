@@ -41,32 +41,35 @@ public class MethodHandleBenchmark {
   @Fork(1)
   @Benchmark
   public double baseline(TestObject state) {
-    return testMethod(state);
+    return TestObject.testMethod(state);
   }
 
   @Fork(1)
   @Benchmark
   public double reflection(TestObject state) throws Exception {
-    Method method = MethodHandleBenchmark.class.getMethod("testMethod", TestObject.class);
-    return (double) method.invoke(null, state);
+    return (double) state.method.invoke(null, state);
   }
 
-  public static double testMethod(TestObject testObject) {
-    return testObject.i + testObject.d;
-  }
+
 
 
   @State(Scope.Thread)
   public static class TestObject {
     private volatile int i;
     private volatile double d;
+    private volatile Method method;
 
     @Setup(Level.Iteration)
-    public void setup() {
+    public void setup() throws Exception {
       Random random = new Random();
-
       this.i = random.nextInt();
       this.d = random.nextDouble();
+
+      this.method = getClass().getMethod("testMethod", TestObject.class);
+    }
+
+    public static double testMethod(TestObject testObject) {
+      return testObject.i + testObject.d;
     }
   }
 }
