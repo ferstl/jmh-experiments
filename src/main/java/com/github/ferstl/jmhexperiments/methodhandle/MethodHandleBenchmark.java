@@ -1,5 +1,6 @@
 package com.github.ferstl.jmhexperiments.methodhandle;
 
+import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Method;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -21,6 +22,9 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import com.github.ferstl.jmhexperiments.ChartFucker;
 
+import static java.lang.invoke.MethodHandles.lookup;
+import static java.lang.invoke.MethodType.methodType;
+
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 public class MethodHandleBenchmark {
@@ -35,7 +39,7 @@ public class MethodHandleBenchmark {
       .build();
     new Runner(options).run();
 
-    ChartFucker.fuck(options.getOutput().orElse("jmh-result.csv"));
+    ChartFucker.fuck(options.getResult().orElse("jmh-result.csv"));
   }
 
   @Fork(1)
@@ -50,7 +54,17 @@ public class MethodHandleBenchmark {
     return (double) state.method.invoke(null, state);
   }
 
+  @Fork(1)
+  @Benchmark
+  public double methodHandle(TestObject state) throws Throwable {
+    return (double) state.methodHandle.invoke(state);
+  }
 
+  @Fork(1)
+  @Benchmark
+  public double boundMethodHandle(TestObject state) throws Throwable {
+    return (double) state.boundMethodHandle.invoke();
+  }
 
 
   @State(Scope.Thread)
@@ -58,6 +72,8 @@ public class MethodHandleBenchmark {
     private volatile int i;
     private volatile double d;
     private volatile Method method;
+    private volatile MethodHandle methodHandle;
+    private volatile MethodHandle boundMethodHandle;
 
     @Setup(Level.Iteration)
     public void setup() throws Exception {
@@ -66,6 +82,8 @@ public class MethodHandleBenchmark {
       this.d = random.nextDouble();
 
       this.method = getClass().getMethod("testMethod", TestObject.class);
+      this.methodHandle = lookup().findStatic(TestObject.class, "testMethod", methodType(double.class, TestObject.class));
+      this.boundMethodHandle = lookup().findStatic(TestObject.class, "testMethod", methodType(double.class, TestObject.class)).bindTo(this);
     }
 
     public static double testMethod(TestObject testObject) {
