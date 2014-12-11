@@ -44,26 +44,50 @@ public class MethodHandleBenchmark {
 
   @Fork(1)
   @Benchmark
-  public double baseline(TestObject state) {
-    return TestObject.testMethod(state);
+  public double baselineVirtual(TestObject state) {
+    return state.testMethod(state.o);
   }
 
   @Fork(1)
   @Benchmark
-  public double reflection(TestObject state) throws Exception {
-    return (double) state.method.invoke(null, state);
+  public double reflectionVirtual(TestObject state) throws Exception {
+    return (double) state.method.invoke(state, state.o);
   }
 
   @Fork(1)
   @Benchmark
-  public double methodHandle(TestObject state) throws Throwable {
-    return (double) state.methodHandle.invoke(state);
+  public double methodHandleVirtual(TestObject state) throws Throwable {
+    return (double) state.methodHandle.invoke(state, state.o);
   }
 
   @Fork(1)
   @Benchmark
-  public double boundMethodHandle(TestObject state) throws Throwable {
+  public double boundMethodHandleVirtual(TestObject state) throws Throwable {
     return (double) state.boundMethodHandle.invoke();
+  }
+
+  @Fork(1)
+  @Benchmark
+  public double baselineStatic(TestObject state) {
+    return TestObject.staticTestMethod(state);
+  }
+
+  @Fork(1)
+  @Benchmark
+  public double reflectionStatic(TestObject state) throws Exception {
+    return (double) state.staticMethod.invoke(null, state);
+  }
+
+  @Fork(1)
+  @Benchmark
+  public double methodHandleStatic(TestObject state) throws Throwable {
+    return (double) state.staticMethodHandle.invoke(state);
+  }
+
+  @Fork(1)
+  @Benchmark
+  public double boundMethodHandleStatic(TestObject state) throws Throwable {
+    return (double) state.staticBoundMethodHandle.invoke();
   }
 
 
@@ -71,23 +95,38 @@ public class MethodHandleBenchmark {
   public static class TestObject {
     private volatile int i;
     private volatile double d;
+    private volatile Object o;
+
     private volatile Method method;
     private volatile MethodHandle methodHandle;
     private volatile MethodHandle boundMethodHandle;
+
+    private volatile Method staticMethod;
+    private volatile MethodHandle staticMethodHandle;
+    private volatile MethodHandle staticBoundMethodHandle;
 
     @Setup(Level.Iteration)
     public void setup() throws Exception {
       Random random = new Random();
       this.i = random.nextInt();
       this.d = random.nextDouble();
+      this.o = new Object();
 
-      this.method = getClass().getMethod("testMethod", TestObject.class);
-      this.methodHandle = lookup().findStatic(TestObject.class, "testMethod", methodType(double.class, TestObject.class));
-      this.boundMethodHandle = lookup().findStatic(TestObject.class, "testMethod", methodType(double.class, TestObject.class)).bindTo(this);
+      this.method = getClass().getMethod("testMethod", Object.class);
+      this.methodHandle = lookup().findVirtual(TestObject.class, "testMethod", methodType(double.class, Object.class));
+      this.boundMethodHandle = lookup().findVirtual(TestObject.class, "testMethod", methodType(double.class, Object.class)).bindTo(this).bindTo(this.o);
+
+      this.staticMethod = getClass().getMethod("staticTestMethod", TestObject.class);
+      this.staticMethodHandle = lookup().findStatic(TestObject.class, "staticTestMethod", methodType(double.class, TestObject.class));
+      this.staticBoundMethodHandle = lookup().findStatic(TestObject.class, "staticTestMethod", methodType(double.class, TestObject.class)).bindTo(this);
     }
 
-    public static double testMethod(TestObject testObject) {
+    public static double staticTestMethod(TestObject testObject) {
       return testObject.i + testObject.d;
+    }
+
+    public double testMethod(Object o) {
+      return this.i - this.d + System.identityHashCode(o);
     }
   }
 }
