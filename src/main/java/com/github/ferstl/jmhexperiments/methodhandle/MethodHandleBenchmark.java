@@ -31,7 +31,7 @@ public class MethodHandleBenchmark {
 
   public static void main(String[] args) throws RunnerException {
     Options options = new OptionsBuilder()
-      .include(".*Benchmark.*")
+      .include(".*MethodHandleBenchmark.*")
       .warmupIterations(10)
       .measurementIterations(10)
       .resultFormat(ResultFormatType.CSV)
@@ -45,7 +45,7 @@ public class MethodHandleBenchmark {
   @Fork(1)
   @Benchmark
   public double baselineVirtual(TestObject state) {
-    return state.testMethod(state.o);
+    return state.testMethod();
   }
 
   @Fork(1)
@@ -57,7 +57,7 @@ public class MethodHandleBenchmark {
   @Fork(1)
   @Benchmark
   public double methodHandleVirtual(TestObject state) throws Throwable {
-    return (double) state.methodHandle.invoke(state, state.o);
+    return (double) state.methodHandle.invoke(state);
   }
 
   @Fork(1)
@@ -112,9 +112,9 @@ public class MethodHandleBenchmark {
       this.d = random.nextDouble();
       this.o = new Object();
 
-      this.method = getClass().getMethod("testMethod", Object.class);
-      this.methodHandle = lookup().findVirtual(TestObject.class, "testMethod", methodType(double.class, Object.class));
-      this.boundMethodHandle = lookup().findVirtual(TestObject.class, "testMethod", methodType(double.class, Object.class)).bindTo(this).bindTo(this.o);
+      this.method = getClass().getMethod("testMethod");
+      this.methodHandle = lookup().findVirtual(TestObject.class, "testMethod", methodType(double.class));
+      this.boundMethodHandle = lookup().findVirtual(TestObject.class, "testMethod", methodType(double.class)).bindTo(this);
 
       this.staticMethod = getClass().getMethod("staticTestMethod", TestObject.class);
       this.staticMethodHandle = lookup().findStatic(TestObject.class, "staticTestMethod", methodType(double.class, TestObject.class));
@@ -125,8 +125,8 @@ public class MethodHandleBenchmark {
       return testObject.i + testObject.d;
     }
 
-    public double testMethod(Object o) {
-      return this.i - this.d + System.identityHashCode(o);
+    public double testMethod() {
+      return this.i - this.d;
     }
   }
 }
