@@ -51,7 +51,7 @@ public class MethodHandleBenchmark {
   @Fork(1)
   @Benchmark
   public double reflectionVirtual(TestObject state) throws Exception {
-    return (double) state.method.invoke(state, state.o);
+    return (double) state.method.invoke(state);
   }
 
   @Fork(1)
