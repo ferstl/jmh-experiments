@@ -36,7 +36,7 @@ public class GsonBenchmark {
 
   public static void main(String[] args) throws RunnerException {
     Options options = new OptionsBuilder()
-      .include(".*Benchmark.*")
+      .include(".*GsonBenchmark.*")
       .warmupIterations(10)
       .measurementIterations(10)
       .resultFormat(ResultFormatType.CSV)
