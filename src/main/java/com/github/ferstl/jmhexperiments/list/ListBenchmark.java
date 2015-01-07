@@ -2,6 +2,7 @@ package com.github.ferstl.jmhexperiments.list;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.openjdk.jmh.annotations.Benchmark;
@@ -33,7 +34,7 @@ public class ListBenchmark {
       .measurementIterations(10)
       .resultFormat(ResultFormatType.CSV)
       .result("list-result.csv")
-//      .jvmArgs("-Xms4G", "-Xmx4G")
+      .jvmArgs("-Xmx4G")
       .build();
     new Runner(options).run();
 
@@ -56,7 +57,7 @@ public class ListBenchmark {
   @Benchmark
   public Object addArrayList() {
 
-    ArrayList<Integer> list = new ArrayList<>();
+    List<Integer> list = new ArrayList<>();
     for(int i = 0; i < NR_OF_ELEMENTS; i++) {
       list.add(i);
     }
@@ -68,7 +69,7 @@ public class ListBenchmark {
   @Benchmark
   public Object addLinkedList() {
 
-    ArrayList<Integer> list = new ArrayList<>();
+    List<Integer> list = new LinkedList<>();
     for(int i = 0; i < NR_OF_ELEMENTS; i++) {
       list.add(i);
     }
@@ -100,12 +101,34 @@ public class ListBenchmark {
     }
   }
 
+  @Fork(1)
+  @Benchmark
+  public Object insertAtBeginningArrayList() {
+    List<Integer> list = new ArrayList<>();
+    for(int i = 0; i < NR_OF_ELEMENTS; i++) {
+      list.add(0, i);
+    }
+
+    return list;
+  }
+
+  @Fork(1)
+  @Benchmark
+  public Object insertAtBeginningLinkedList() {
+    List<Integer> list = new LinkedList<>();
+    for(int i = 0; i < NR_OF_ELEMENTS; i++) {
+      list.add(0, i);
+    }
+
+    return list;
+  }
+
   @State(Scope.Benchmark)
   public static class Data {
 
     private Integer[] array;
-    private ArrayList<Integer> arrayList;
-    private LinkedList<Integer> linkedList;
+    private List<Integer> arrayList;
+    private List<Integer> linkedList;
 
     @Setup
     public void setup() {
