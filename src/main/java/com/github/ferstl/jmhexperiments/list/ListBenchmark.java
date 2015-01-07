@@ -8,7 +8,6 @@ import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
-import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -18,9 +17,9 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 import com.github.ferstl.jmhexperiments.ChartFucker;
 
 @BenchmarkMode(Mode.Throughput)
-@OutputTimeUnit(TimeUnit.MINUTES)
+@OutputTimeUnit(TimeUnit.MILLISECONDS)
 public class ListBenchmark {
-  private static final int NR_OF_ELEMENTS = 30_000_000;
+  private static final int NR_OF_ELEMENTS = 10_000;
 
   public static void main(String[] args) throws RunnerException {
     Options options = new OptionsBuilder()
@@ -29,7 +28,7 @@ public class ListBenchmark {
       .measurementIterations(10)
       .resultFormat(ResultFormatType.CSV)
       .result("list-result.csv")
-      .jvmArgs("-Xms1G", "-Xmx8G")
+//      .jvmArgs("-Xms4G", "-Xmx4G")
       .build();
     new Runner(options).run();
 
@@ -39,15 +38,18 @@ public class ListBenchmark {
 
   @Fork(1)
   @Benchmark
-  public void baseline(Blackhole bh) {
+  public Object addBaseline() {
+    Integer[] array = new Integer[NR_OF_ELEMENTS];
     for(int i = 0; i < NR_OF_ELEMENTS; i++) {
-      bh.consume((Object) i);
+      array[i] = i;
     }
+
+    return array;
   }
 
   @Fork(1)
   @Benchmark
-  public Object arrayList() {
+  public Object addArrayList() {
 
     ArrayList<Integer> list = new ArrayList<>();
     for(int i = 0; i < NR_OF_ELEMENTS; i++) {
@@ -59,7 +61,7 @@ public class ListBenchmark {
 
   @Fork(1)
   @Benchmark
-  public Object linkedList() {
+  public Object addLinkedList() {
 
     ArrayList<Integer> list = new ArrayList<>();
     for(int i = 0; i < NR_OF_ELEMENTS; i++) {
@@ -68,4 +70,5 @@ public class ListBenchmark {
 
     return list;
   }
+
 }
