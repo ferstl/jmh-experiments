@@ -80,7 +80,8 @@ public class ListBenchmark {
   @Fork(1)
   @Benchmark
   public void iterateBaseLine(Data data, Blackhole bh) {
-    for(Integer i : data.array) {
+    Integer[] array = data.array;
+    for(Integer i : array) {
       bh.consume(i);
     }
   }
@@ -88,7 +89,8 @@ public class ListBenchmark {
   @Fork(1)
   @Benchmark
   public void iterateArrayList(Data data, Blackhole bh) {
-    for(Integer i : data.arrayList) {
+    List<Integer> list = data.arrayList;
+    for(Integer i : list) {
       bh.consume(i);
     }
   }
@@ -96,7 +98,8 @@ public class ListBenchmark {
   @Fork(1)
   @Benchmark
   public void iterateLinkedList(Data data, Blackhole bh) {
-    for(Integer i : data.linkedList) {
+    List<Integer> list = data.linkedList;
+    for(Integer i : list) {
       bh.consume(i);
     }
   }
@@ -126,9 +129,9 @@ public class ListBenchmark {
   @State(Scope.Benchmark)
   public static class Data {
 
-    private Integer[] array;
-    private List<Integer> arrayList;
-    private List<Integer> linkedList;
+    private volatile Integer[] array;
+    private volatile List<Integer> arrayList;
+    private volatile List<Integer> linkedList;
 
     @Setup
     public void setup() {
