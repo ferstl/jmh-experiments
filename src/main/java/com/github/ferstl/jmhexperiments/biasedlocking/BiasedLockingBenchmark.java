@@ -10,6 +10,7 @@ import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.results.format.ResultFormatType;
@@ -62,6 +63,14 @@ public class BiasedLockingBenchmark {
     }
   }
 
+  @Fork(value = 1, jvmArgsAppend = {"-XX:+UseBiasedLocking", "-XX:BiasedLockingStartupDelay=0"})
+  @Benchmark
+  public void nonBiasedWithIdentityHashCode(DataWithIdentityHashCode data, Blackhole bh) {
+    for (int i = 0; i < 10000; i++) {
+      bh.consume(data.incrementSynchronized());
+    }
+  }
+
   @State(Scope.Benchmark)
   public static class Data {
     int counter = 0;
@@ -79,6 +88,15 @@ public class BiasedLockingBenchmark {
       } finally {
         this.lock.unlock();
       }
+    }
+  }
+
+  @State(Scope.Benchmark)
+  public static class DataWithIdentityHashCode extends Data {
+
+    @Setup
+    public void setup() {
+      System.identityHashCode(this);
     }
   }
 }
