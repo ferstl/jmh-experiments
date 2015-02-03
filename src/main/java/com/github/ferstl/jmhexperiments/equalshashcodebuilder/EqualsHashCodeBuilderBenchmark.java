@@ -16,6 +16,7 @@ import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.Threads;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -63,6 +64,34 @@ public class EqualsHashCodeBuilderBenchmark {
   @Fork(1)
   @Benchmark
   public int hashCodeBuilder(TestState state) {
+    return state.testObject1.hashCodeWithBuilder();
+  }
+
+  @Fork(1)
+  @Threads(4)
+  @Benchmark
+  public boolean equalsBaselineContended(TestState state) {
+    return state.testObject1.equalsPlain(state.testObject2);
+  }
+
+  @Fork(1)
+  @Threads(4)
+  @Benchmark
+  public boolean equalsBuilderContended(TestState state) {
+    return state.testObject1.equalsWithBuilder(state.testObject2);
+  }
+
+  @Fork(1)
+  @Threads(4)
+  @Benchmark
+  public int hashCodeBaselineContended(TestState state) {
+    return state.testObject1.hashCodePlain();
+  }
+
+  @Fork(1)
+  @Threads(4)
+  @Benchmark
+  public int hashCodeBuilderContended(TestState state) {
     return state.testObject1.hashCodeWithBuilder();
   }
 
