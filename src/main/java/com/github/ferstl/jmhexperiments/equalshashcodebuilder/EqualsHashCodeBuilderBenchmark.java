@@ -68,28 +68,28 @@ public class EqualsHashCodeBuilderBenchmark {
   }
 
   @Fork(1)
-  @Threads(4)
+  @Threads(7)
   @Benchmark
   public boolean equalsBaselineContended(TestState state) {
     return state.testObject1.equalsPlain(state.testObject2);
   }
 
   @Fork(1)
-  @Threads(4)
+  @Threads(7)
   @Benchmark
   public boolean equalsBuilderContended(TestState state) {
     return state.testObject1.equalsWithBuilder(state.testObject2);
   }
 
   @Fork(1)
-  @Threads(4)
+  @Threads(7)
   @Benchmark
   public int hashCodeBaselineContended(TestState state) {
     return state.testObject1.hashCodePlain();
   }
 
   @Fork(1)
-  @Threads(4)
+  @Threads(7)
   @Benchmark
   public int hashCodeBuilderContended(TestState state) {
     return state.testObject1.hashCodeWithBuilder();
