@@ -24,8 +24,8 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import com.github.ferstl.jmhexperiments.ChartFucker;
 
-@BenchmarkMode(Mode.Throughput)
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
 public class EqualsHashCodeBuilderBenchmark {
 
   public static void main(String[] args) throws RunnerException {
@@ -34,12 +34,12 @@ public class EqualsHashCodeBuilderBenchmark {
       .warmupIterations(10)
       .measurementIterations(10)
       .resultFormat(ResultFormatType.CSV)
-      .result("methodhandle-result.csv")
+      .result("equals-hashcode-builder.csv")
       .build();
 
     new Runner(options).run();
 
-    ChartFucker.fuck(options.getResult().orElse("methodhandle-result.csv"));
+    ChartFucker.fuck(options.getResult().orElse("equals-hashcode-builder.csv"));
   }
 
   @Fork(1)
@@ -52,6 +52,18 @@ public class EqualsHashCodeBuilderBenchmark {
   @Benchmark
   public boolean equalsBuilder(TestState state) {
     return state.testObject1.equalsWithBuilder(state.testObject2);
+  }
+
+  @Fork(1)
+  @Benchmark
+  public int hashCodeBaseline(TestState state) {
+    return state.testObject1.hashCodePlain();
+  }
+
+  @Fork(1)
+  @Benchmark
+  public int hashCodeBuilder(TestState state) {
+    return state.testObject1.hashCodeWithBuilder();
   }
 
   // Just to verify that the implementations produce correct results
