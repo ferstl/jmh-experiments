@@ -114,7 +114,7 @@ public class EqualsHashCodeBuilderBenchmark {
     private volatile TestObject testObject1;
     private volatile TestObject testObject2;
 
-    @Setup(Level.Iteration)
+    @Setup(Level.Trial)
     public void setup() {
       Random random = new Random();
 
