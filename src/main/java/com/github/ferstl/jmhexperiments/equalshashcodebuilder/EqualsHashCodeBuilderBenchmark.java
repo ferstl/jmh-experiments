@@ -189,7 +189,7 @@ public class EqualsHashCodeBuilderBenchmark {
         .append(this.d, other.d)
         .append(this.s, other.s)
         .append(this.array, other.array)
-        .build();
+        .isEquals();
     }
 
     public int hashCodeWithBuilder() {
@@ -198,7 +198,7 @@ public class EqualsHashCodeBuilderBenchmark {
         .append(this.d)
         .append(this.s)
         .append(this.array)
-        .build();
+        .toHashCode();
     }
   }
 }
