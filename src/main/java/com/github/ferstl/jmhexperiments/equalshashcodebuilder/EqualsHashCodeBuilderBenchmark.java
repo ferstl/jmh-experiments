@@ -111,8 +111,8 @@ public class EqualsHashCodeBuilderBenchmark {
   @State(Scope.Thread)
   public static class TestState {
 
-    private volatile TestObject testObject1;
-    private volatile TestObject testObject2;
+    private TestObject testObject1;
+    private TestObject testObject2;
 
     @Setup(Level.Trial)
     public void setup() {
