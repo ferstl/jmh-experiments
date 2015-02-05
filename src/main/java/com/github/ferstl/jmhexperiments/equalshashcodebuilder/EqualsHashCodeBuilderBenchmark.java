@@ -43,7 +43,7 @@ public class EqualsHashCodeBuilderBenchmark {
     ChartFucker.fuck(options.getResult().orElse("equals-hashcode-builder.csv"));
   }
 
-  @Fork(1)
+  @Fork(value = 1, jvmArgs = {/*"-XX:+UnlockCommercialFeatures", "-XX:+FlightRecorder", "-XX:FlightRecorderOptions=defaultrecording=true,settings=profile.jfc,dumponexit=true,dumponexitpath=equals.jfr"*/})
   @Benchmark
   public boolean equalsBaseline(TestState state) {
     return state.testObject1.equalsPlain(state.testObject2);
@@ -67,29 +67,29 @@ public class EqualsHashCodeBuilderBenchmark {
     return state.testObject1.hashCodeWithBuilder();
   }
 
-  @Fork(1)
-  @Threads(7)
+  @Fork(value = 1, jvmArgs = {/*"-XX:+UnlockCommercialFeatures", "-XX:+FlightRecorder", "-XX:FlightRecorderOptions=defaultrecording=true,settings=profile.jfc,dumponexit=true,dumponexitpath=equals-contended.jfr"*/})
+  @Threads(3)
   @Benchmark
   public boolean equalsBaselineContended(TestState state) {
     return state.testObject1.equalsPlain(state.testObject2);
   }
 
   @Fork(1)
-  @Threads(7)
+  @Threads(3)
   @Benchmark
   public boolean equalsBuilderContended(TestState state) {
     return state.testObject1.equalsWithBuilder(state.testObject2);
   }
 
   @Fork(1)
-  @Threads(7)
+  @Threads(3)
   @Benchmark
   public int hashCodeBaselineContended(TestState state) {
     return state.testObject1.hashCodePlain();
   }
 
   @Fork(1)
-  @Threads(7)
+  @Threads(3)
   @Benchmark
   public int hashCodeBuilderContended(TestState state) {
     return state.testObject1.hashCodeWithBuilder();
@@ -116,19 +116,28 @@ public class EqualsHashCodeBuilderBenchmark {
 
     @Setup(Level.Trial)
     public void setup() {
+      long l;
+      double d;
+      String s1;
+      String[] array1;
+      String s2;
+      String[] array2;
       Random random = new Random();
 
-      String[] array = new String[50];
-      for (int i = 0; i < array.length; i++) {
-        array[i] = createRandomString(random, 20);
+      array1 = new String[20];
+      array2 = new String[20];
+      for (int i = 0; i < array1.length; i++) {
+        array1[i] = createRandomString(random, 20);
+        array2[i] = new String(array1[i]);
       }
 
-      long l = random.nextLong();
-      double d = random.nextDouble();
-      String s = createRandomString(random, 200);
+      l = random.nextLong();
+      d = random.nextDouble();
+      s1 = createRandomString(random, 200);
+      s2 = new String(s1);
 
-      this.testObject1 = new TestObject(l, d, s, array);
-      this.testObject2 = new TestObject(l, d, new String(s), array.clone());
+      this.testObject1 = new TestObject(l, d, s1, array1);
+      this.testObject2 = new TestObject(l, d, s2, array2);
     }
 
     private String createRandomString(Random random, int size) {
