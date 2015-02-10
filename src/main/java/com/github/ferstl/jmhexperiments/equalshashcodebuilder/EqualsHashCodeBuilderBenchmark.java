@@ -30,6 +30,7 @@ import com.github.ferstl.jmhexperiments.ChartFucker;
 public class EqualsHashCodeBuilderBenchmark {
 
   public static void main(String[] args) throws RunnerException {
+    verifyImplementation();
     Options options = new OptionsBuilder()
       .include(".*EqualsHashCodeBuilderBenchmark.*")
       .warmupIterations(10)
@@ -95,17 +96,17 @@ public class EqualsHashCodeBuilderBenchmark {
     return state.hashCodeWithBuilder();
   }
 
-  // Just to verify that the implementations produce correct results
-  public static void testImplementation() {
+  private static void verifyImplementation() {
     TestState state = new TestState();
     state.setup();
 
-    System.out.println(state.equalsPlain(state));
-    System.out.println(state.equalsWithBuilder(state));
-    System.out.println(state.hashCodePlain());
-    System.out.println(state.hashCodeWithBuilder());
-    System.out.println(state.hashCodePlain());
-    System.out.println(state.hashCodeWithBuilder());
+    if (!state.equalsPlain(state)) {
+      throw new AssertionError("equalsPlain() not true");
+    }
+
+    if (!state.equalsWithBuilder(state)) {
+      throw new AssertionError("equalsWithBuilder() not true");
+    }
   }
 
   @State(Scope.Thread)
