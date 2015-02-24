@@ -1,6 +1,7 @@
 package com.github.ferstl.jmhexperiments.tostring;
 
 import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
@@ -14,7 +15,7 @@ import com.github.ferstl.jmhexperiments.ChartFucker;
  * Show the differences between various toString methods for booleans.
  */
 public class BooleanToStringBenchmark {
-  
+
   public static void main(String[] args) throws RunnerException {
     String fileName = "boolean-to-string-result.csv";
     Options options = new OptionsBuilder()
@@ -29,11 +30,13 @@ public class BooleanToStringBenchmark {
     ChartFucker.fuck(options.getResult().orElse(fileName));
   }
 
+  @Fork(1)
   @Benchmark
   public void instanceToString(Blackhole bh) {
     bh.consume(Boolean.TRUE.toString());
   }
 
+  @Fork(1)
   @Benchmark
   public void staticToString(Blackhole bh) {
     bh.consume(Boolean.toString(true));
