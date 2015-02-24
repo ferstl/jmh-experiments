@@ -7,7 +7,6 @@ import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
-import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -39,14 +38,14 @@ public class BooleanToStringBenchmark {
 
   @Fork(1)
   @Benchmark
-  public void instanceToString(Blackhole bh) {
-    bh.consume(Boolean.TRUE.toString());
+  public String instanceToString() {
+    return Boolean.TRUE.toString();
   }
 
   @Fork(1)
   @Benchmark
-  public void staticToString(Blackhole bh) {
-    bh.consume(Boolean.toString(true));
+  public String staticToString() {
+    return Boolean.toString(true);
   }
 
 }
