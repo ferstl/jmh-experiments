@@ -4,8 +4,7 @@ import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
+import java.io.Writer;
 import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.Random;
@@ -23,16 +22,24 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
 
 import com.github.ferstl.jmhexperiments.ChartFucker;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.Files.newBufferedWriter;
+import static java.nio.file.StandardOpenOption.CREATE;
+import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
+
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.SECONDS)
 public class FileWriteBenchmark {
 
+  private static final int NR_OF_LINES = 10_000;
+
   public static void main(String[] args) throws RunnerException {
-    String fileName = "bigdecimal-construct-result.csv";
+    String fileName = "filewrite-result.csv";
     Options options = new OptionsBuilder()
         .include(".*FileWriteBenchmark.*")
         .warmupIterations(0)
         .measurementIterations(5)
+        .forks(5)
         .resultFormat(ResultFormatType.CSV)
         .result(fileName)
         .build();
@@ -44,12 +51,10 @@ public class FileWriteBenchmark {
   @Benchmark
   public void bufferedWriterWithFlush() throws IOException {
     String text = createText();
-    try(BufferedWriter writer = Files.newBufferedWriter(Paths.get("text"), StandardCharsets.UTF_8)) {
 
-      for (int i = 0; i < 10_000; i++) {
-        writer.write(text);
-        writer.write("\n");
-        writer.flush();
+    try(BufferedWriter writer = newBufferedWriter(Paths.get("file1"), UTF_8, CREATE, TRUNCATE_EXISTING)) {
+      for (int i = 0; i < NR_OF_LINES; i++) {
+        writeLine(text, writer);
       }
     }
   }
@@ -57,16 +62,20 @@ public class FileWriteBenchmark {
   @Benchmark
   public void bufferedWriterWithSync() throws IOException {
     String text = createText();
-    FileOutputStream fos = new FileOutputStream(Paths.get("text").toFile());
 
-    try(BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8))) {
-
-      for (int i = 0; i < 10_000; i++) {
-        writer.write(text);
-        writer.write("\n");
+    try(FileOutputStream fos = new FileOutputStream(Paths.get("file2").toFile(), false)) {
+      BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos, UTF_8));
+      for (int i = 0; i < NR_OF_LINES; i++) {
+        writeLine(text, writer);
         fos.getFD().sync();
       }
     }
+  }
+
+  private void writeLine(String text, Writer writer) throws IOException {
+    writer.write(text);
+    writer.write("\n");
+    writer.flush();
   }
 
   private static final String createText() {
