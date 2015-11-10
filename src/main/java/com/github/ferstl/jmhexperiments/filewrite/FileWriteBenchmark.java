@@ -72,6 +72,51 @@ public class FileWriteBenchmark {
     }
   }
 
+  @Benchmark
+  public void bufferedWriterWithSyncAfter10Lines() throws IOException {
+    String text = createText();
+
+    try(FileOutputStream fos = new FileOutputStream(Paths.get("file10").toFile(), false)) {
+      BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos, UTF_8));
+      for (int i = 0; i < NR_OF_LINES; i++) {
+        writeLine(text, writer);
+        if (i % 10 == 0) {
+          fos.getFD().sync();
+        }
+      }
+    }
+  }
+
+  @Benchmark
+  public void bufferedWriterWithSyncAfter100Lines() throws IOException {
+    String text = createText();
+
+    try(FileOutputStream fos = new FileOutputStream(Paths.get("file100").toFile(), false)) {
+      BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos, UTF_8));
+      for (int i = 0; i < NR_OF_LINES; i++) {
+        writeLine(text, writer);
+        if (i % 100 == 0) {
+          fos.getFD().sync();
+        }
+      }
+    }
+  }
+
+  @Benchmark
+  public void bufferedWriterWithSyncAfter1000Lines() throws IOException {
+    String text = createText();
+
+    try(FileOutputStream fos = new FileOutputStream(Paths.get("file1000").toFile(), false)) {
+      BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos, UTF_8));
+      for (int i = 0; i < NR_OF_LINES; i++) {
+        writeLine(text, writer);
+        if (i % 1000 == 0) {
+          fos.getFD().sync();
+        }
+      }
+    }
+  }
+
   private void writeLine(String text, Writer writer) throws IOException {
     writer.write(text);
     writer.write("\n");
