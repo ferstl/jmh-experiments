@@ -49,7 +49,19 @@ public class FileWriteBenchmark {
   public void bufferedWriterWithFlush() throws IOException {
     String text = createText();
 
-    try(BufferedWriter writer = newBufferedWriter(Paths.get("file1"), UTF_8, CREATE, TRUNCATE_EXISTING)) {
+    try(FileOutputStream fos = new FileOutputStream(Paths.get("file1").toFile(), false)) {
+      BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos, UTF_8));
+      for (int i = 0; i < NR_OF_LINES; i++) {
+        writeLine(text, writer);
+      }
+    }
+  }
+
+  @Benchmark
+  public void bufferedWriterNio2WithFlush() throws IOException {
+    String text = createText();
+
+    try(BufferedWriter writer = newBufferedWriter(Paths.get("file2"), UTF_8, CREATE, TRUNCATE_EXISTING)) {
       for (int i = 0; i < NR_OF_LINES; i++) {
         writeLine(text, writer);
       }
@@ -60,7 +72,7 @@ public class FileWriteBenchmark {
   public void bufferedWriterWithSync() throws IOException {
     String text = createText();
 
-    try(FileOutputStream fos = new FileOutputStream(Paths.get("file2").toFile(), false)) {
+    try(FileOutputStream fos = new FileOutputStream(Paths.get("file3").toFile(), false)) {
       BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos, UTF_8));
       for (int i = 0; i < NR_OF_LINES; i++) {
         writeLine(text, writer);
