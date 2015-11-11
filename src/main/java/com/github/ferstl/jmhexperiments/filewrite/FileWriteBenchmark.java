@@ -9,7 +9,6 @@ import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
-
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
@@ -19,9 +18,7 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-
 import com.github.ferstl.jmhexperiments.ChartFucker;
-
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.newBufferedWriter;
 import static java.nio.file.StandardOpenOption.CREATE;
@@ -31,7 +28,7 @@ import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 @OutputTimeUnit(TimeUnit.SECONDS)
 public class FileWriteBenchmark {
 
-  private static final int NR_OF_LINES = 10_000;
+  private static final int NR_OF_LINES = 30_000;
 
   public static void main(String[] args) throws RunnerException {
     String fileName = "filewrite-result.csv";
