@@ -33,7 +33,7 @@ public class ArrayEqualsBenchmark {
         .warmupIterations(10)
         .measurementIterations(10)
         .resultFormat(ResultFormatType.CSV)
-        .result("equals-hashcode-builder.csv")
+        .result("equals-array.csv")
         .build();
 
       new Runner(options).run();
