@@ -4,8 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
-import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.NumberAxis;
@@ -22,17 +21,17 @@ import org.supercsv.prefs.CsvPreference;
 
 public class ChartFucker {
 
-  private static final String[] CSV_COLUMNS = { "benchmark", "mode", "threads", "samples", "score", "error", "unit" };
-  private static final CellProcessor[] CSV_CELL_PROCESSORS = {null, null, new ParseInt(), new ParseInt(), new ParseDouble(), new ParseDouble(), null };
+  private static final String[] CSV_COLUMNS = {"benchmark", "mode", "threads", "samples", "score", "error", "unit"};
+  private static final CellProcessor[] CSV_CELL_PROCESSORS = {null, null, new ParseInt(), new ParseInt(), new ParseDouble(), new ParseDouble(), null};
 
   public static void fuck(String fileName) {
-    try(CsvBeanReader csvReader = new CsvBeanReader(Files.newBufferedReader(Paths.get(fileName)), CsvPreference.STANDARD_PREFERENCE)) {
+    try (CsvBeanReader csvReader = new CsvBeanReader(Files.newBufferedReader(Paths.get(fileName)), CsvPreference.STANDARD_PREFERENCE)) {
       // skip the header
       csvReader.getHeader(true);
 
       DefaultStatisticalCategoryDataset ds = new DefaultStatisticalCategoryDataset();
       CsvEntry entry;
-      while((entry = csvReader.read(CsvEntry.class, CSV_COLUMNS, CSV_CELL_PROCESSORS)) != null) {
+      while ((entry = csvReader.read(CsvEntry.class, CSV_COLUMNS, CSV_CELL_PROCESSORS)) != null) {
         addToDataSet(ds, entry);
       }
 
@@ -45,7 +44,7 @@ public class ChartFucker {
 
       JFreeChart chart = new JFreeChart(plot);
       chart.removeLegend();
-      ChartUtilities.saveChartAsPNG(getChartFile(fileName), chart, 600, 300);
+      ChartUtils.saveChartAsPNG(getChartFile(fileName), chart, 600, 300);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
