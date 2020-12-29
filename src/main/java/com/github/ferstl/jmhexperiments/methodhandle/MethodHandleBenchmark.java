@@ -102,16 +102,16 @@ public class MethodHandleBenchmark {
 
   @State(Scope.Thread)
   public static class TestObject {
-    private volatile int i;
-    private volatile double d;
+    private int i;
+    private double d;
 
-    private volatile Method method;
-    private volatile MethodHandle methodHandle;
-    private volatile MethodHandle boundMethodHandle;
+    private Method method;
+    private MethodHandle methodHandle;
+    private MethodHandle boundMethodHandle;
 
-    private volatile Method staticMethod;
-    private volatile MethodHandle staticMethodHandle;
-    private volatile MethodHandle staticBoundMethodHandle;
+    private Method staticMethod;
+    private MethodHandle staticMethodHandle;
+    private MethodHandle staticBoundMethodHandle;
 
     @Setup(Level.Trial)
     public void setup() throws Exception {
