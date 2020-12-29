@@ -1,13 +1,12 @@
 package com.github.ferstl.jmhexperiments.methodhandle;
 
 import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.Method;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
-
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
-import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
@@ -19,11 +18,8 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-
 import com.github.ferstl.jmhexperiments.ChartFucker;
-
 import static java.lang.invoke.MethodHandles.lookup;
-import static java.lang.invoke.MethodType.methodType;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
@@ -108,7 +104,6 @@ public class MethodHandleBenchmark {
   public static class TestObject {
     private volatile int i;
     private volatile double d;
-    private volatile Object o;
 
     private volatile Method method;
     private volatile MethodHandle methodHandle;
@@ -118,20 +113,20 @@ public class MethodHandleBenchmark {
     private volatile MethodHandle staticMethodHandle;
     private volatile MethodHandle staticBoundMethodHandle;
 
-    @Setup(Level.Iteration)
+    @Setup(Level.Trial)
     public void setup() throws Exception {
       Random random = new Random();
       this.i = random.nextInt();
       this.d = random.nextDouble();
-      this.o = new Object();
 
       this.method = getClass().getMethod("testMethod");
-      this.methodHandle = lookup().findVirtual(TestObject.class, "testMethod", methodType(double.class));
-      this.boundMethodHandle = lookup().findVirtual(TestObject.class, "testMethod", methodType(double.class)).bindTo(this);
+      Lookup lookup = lookup();
+      this.methodHandle = lookup.unreflect(this.method);
+      this.boundMethodHandle = this.methodHandle.bindTo(this);
 
       this.staticMethod = getClass().getMethod("staticTestMethod", TestObject.class);
-      this.staticMethodHandle = lookup().findStatic(TestObject.class, "staticTestMethod", methodType(double.class, TestObject.class));
-      this.staticBoundMethodHandle = lookup().findStatic(TestObject.class, "staticTestMethod", methodType(double.class, TestObject.class)).bindTo(this);
+      this.staticMethodHandle = lookup.unreflect(this.staticMethod);
+      this.staticBoundMethodHandle = this.staticMethodHandle.bindTo(this);
     }
 
     public static double staticTestMethod(TestObject testObject) {
