@@ -1,6 +1,7 @@
 package com.github.ferstl.jmhexperiments.methodhandle;
 
 import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.Method;
 import java.util.Random;
@@ -20,10 +21,25 @@ import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import com.github.ferstl.jmhexperiments.ChartFucker;
 import static java.lang.invoke.MethodHandles.lookup;
+import static java.lang.invoke.MethodType.methodType;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 public class MethodHandleBenchmark {
+
+  static final MethodHandle TEST_METHOD;
+
+  static final MethodHandle STATIC_TEST_METHOD;
+
+  static {
+    Lookup lookup = MethodHandles.lookup();
+    try {
+      TEST_METHOD = lookup.findVirtual(TestObject.class, "testMethod", methodType(double.class));
+      STATIC_TEST_METHOD = lookup.findStatic(TestObject.class, "staticTestMethod", methodType(double.class, TestObject.class));
+    } catch (ReflectiveOperationException e) {
+      throw new RuntimeException("could not lookup method handles", e);
+    }
+  }
 
   public static void main(String[] args) throws RunnerException {
     Options options = new OptionsBuilder()
@@ -60,6 +76,11 @@ public class MethodHandleBenchmark {
   }
 
   @Benchmark
+  public double staticFinalMethodHandleVirtualExact(TestObject state) throws Throwable {
+    return (double) TEST_METHOD.invokeExact(state);
+  }
+
+  @Benchmark
   public double boundMethodHandleVirtual(TestObject state) throws Throwable {
     return (double) state.boundMethodHandle.invoke();
   }
@@ -87,6 +108,11 @@ public class MethodHandleBenchmark {
   @Benchmark
   public double methodHandleStaticExact(TestObject state) throws Throwable {
     return (double) state.staticMethodHandle.invokeExact(state);
+  }
+
+  @Benchmark
+  public double staticFinalMethodHandleStaticExact(TestObject state) throws Throwable {
+    return (double) STATIC_TEST_METHOD.invokeExact(state);
   }
 
   @Benchmark
