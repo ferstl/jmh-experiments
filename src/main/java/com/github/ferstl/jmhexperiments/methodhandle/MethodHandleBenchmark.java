@@ -59,8 +59,18 @@ public class MethodHandleBenchmark {
   }
 
   @Benchmark
+  public double methodHandleVirtualExact(TestObject state) throws Throwable {
+    return (double) state.methodHandle.invokeExact(state);
+  }
+
+  @Benchmark
   public double boundMethodHandleVirtual(TestObject state) throws Throwable {
     return (double) state.boundMethodHandle.invoke();
+  }
+
+  @Benchmark
+  public double boundMethodHandleVirtualExact(TestObject state) throws Throwable {
+    return (double) state.boundMethodHandle.invokeExact();
   }
 
   @Benchmark
@@ -79,8 +89,18 @@ public class MethodHandleBenchmark {
   }
 
   @Benchmark
+  public double methodHandleStaticExact(TestObject state) throws Throwable {
+    return (double) state.staticMethodHandle.invokeExact(state);
+  }
+
+  @Benchmark
   public double boundMethodHandleStatic(TestObject state) throws Throwable {
     return (double) state.staticBoundMethodHandle.invoke();
+  }
+
+  @Benchmark
+  public double boundMethodHandleStaticExact(TestObject state) throws Throwable {
+    return (double) state.staticBoundMethodHandle.invokeExact();
   }
 
 
