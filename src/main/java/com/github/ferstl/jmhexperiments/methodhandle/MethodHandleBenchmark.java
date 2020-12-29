@@ -32,6 +32,7 @@ public class MethodHandleBenchmark {
   public static void main(String[] args) throws RunnerException {
     Options options = new OptionsBuilder()
       .include(".*MethodHandleBenchmark.*")
+      .forks(1)
       .warmupIterations(10)
       .measurementIterations(10)
       .resultFormat(ResultFormatType.CSV)
@@ -42,49 +43,41 @@ public class MethodHandleBenchmark {
     ChartFucker.fuck(options.getResult().orElse("jmh-result.csv"));
   }
 
-  @Fork(1)
   @Benchmark
   public double baselineVirtual(TestObject state) {
     return state.testMethod();
   }
 
-  @Fork(1)
   @Benchmark
   public double reflectionVirtual(TestObject state) throws Exception {
     return (double) state.method.invoke(state);
   }
 
-  @Fork(1)
   @Benchmark
   public double methodHandleVirtual(TestObject state) throws Throwable {
     return (double) state.methodHandle.invoke(state);
   }
 
-  @Fork(1)
   @Benchmark
   public double boundMethodHandleVirtual(TestObject state) throws Throwable {
     return (double) state.boundMethodHandle.invoke();
   }
 
-  @Fork(1)
   @Benchmark
   public double baselineStatic(TestObject state) {
     return TestObject.staticTestMethod(state);
   }
 
-  @Fork(1)
   @Benchmark
   public double reflectionStatic(TestObject state) throws Exception {
     return (double) state.staticMethod.invoke(null, state);
   }
 
-  @Fork(1)
   @Benchmark
   public double methodHandleStatic(TestObject state) throws Throwable {
     return (double) state.staticMethodHandle.invoke(state);
   }
 
-  @Fork(1)
   @Benchmark
   public double boundMethodHandleStatic(TestObject state) throws Throwable {
     return (double) state.staticBoundMethodHandle.invoke();
